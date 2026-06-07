@@ -2,6 +2,7 @@ import { Badge } from '../ui/Badge';
 import { EmptyState } from '../ui/EmptyState';
 import { BookOpen, Terminal, Key } from 'lucide-react';
 import { WalkthroughResult } from '../../types';
+import { displayText } from '../../utils/resultNormalizers';
 
 interface Props {
   result?: WalkthroughResult;
@@ -19,11 +20,14 @@ export function WalkthroughTab({ result, animated }: Props) {
     );
   }
 
+  const prerequisites = result.prerequisites || [];
+  const steps = result.steps || [];
+
   return (
     <div className="tab-stack">
       <section className="glass-panel">
         <h3 style={{ marginBottom: '12px' }}>Overview</h3>
-        <p style={{ color: 'var(--text-secondary)' }}>{result.overview}</p>
+        <p style={{ color: 'var(--text-secondary)' }}>{displayText(result.overview, 'Integration walkthrough')}</p>
       </section>
 
       <div className="two-column-grid">
@@ -32,11 +36,11 @@ export function WalkthroughTab({ result, animated }: Props) {
             <Key size={16} /> Prerequisites
           </h3>
           <div className="endpoint-list">
-            {result.prerequisites.map((env) => (
-              <div key={env.key} className="endpoint-row">
-                <Badge tone={env.required ? 'cyan' : 'neutral'}>{env.key}</Badge>
+            {prerequisites.map((env, index) => (
+              <div key={`${displayText(env.key, 'ENV_VAR')}-${index}`} className="endpoint-row prereq-row">
+                <Badge tone={env.required ? 'cyan' : 'neutral'}>{displayText(env.key, 'ENV_VAR')}</Badge>
                 <div>
-                  <p style={{ fontSize: '0.9rem' }}>{env.description}</p>
+                  <p style={{ fontSize: '0.9rem' }}>{displayText(env.description, '')}</p>
                 </div>
               </div>
             ))}
@@ -49,7 +53,7 @@ export function WalkthroughTab({ result, animated }: Props) {
           </h3>
           <div className="code-shell" style={{ height: 'auto', flex: 'none', background: 'var(--bg-inset)' }}>
             <pre>
-              <code>{result.executionCommand}</code>
+              <code>{displayText(result.executionCommand, 'python connector.py')}</code>
             </pre>
           </div>
         </section>
@@ -58,17 +62,17 @@ export function WalkthroughTab({ result, animated }: Props) {
       <section className="glass-panel" style={{ flex: 1, overflowY: 'auto' }}>
         <h3 style={{ marginBottom: '16px' }}>Step-by-Step Logic Breakdown</h3>
         <div className="tab-stack">
-          {result.steps.map((step, index) => (
+          {steps.map((step, index) => (
             <div key={index} className="glass-panel" style={{ background: 'var(--bg-inset)', padding: '16px' }}>
               <h4 style={{ marginBottom: '8px' }}>
-                {index + 1}. {step.title}
+                {index + 1}. {displayText(step.title, `Step ${index + 1}`)}
               </h4>
               <p style={{ color: 'var(--text-secondary)', marginBottom: '12px', fontSize: '0.95rem' }}>
-                {step.description}
+                {displayText(step.description, '')}
               </p>
               <div className="code-shell" style={{ height: 'auto', flex: 'none', background: 'var(--bg-base)' }}>
                 <pre>
-                  <code>{step.codeSnippet}</code>
+                  <code>{displayText(step.codeSnippet, '')}</code>
                 </pre>
               </div>
             </div>

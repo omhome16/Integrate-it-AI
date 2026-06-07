@@ -1,12 +1,14 @@
-import { Code2, GitMerge, BookOpen, Zap } from 'lucide-react';
+import { Code2, GitMerge, BookOpen, Zap, FileText, ShieldCheck } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { AgentName, AgentState, TabId } from '../../types';
 
-const TABS: Array<{ id: TabId; label: string; icon: LucideIcon }> = [
+const TABS: Array<{ id: TabId; label: string; icon: LucideIcon; agent?: AgentName }> = [
   { id: 'discovery', label: 'Discovery', icon: Zap },
   { id: 'mapping', label: 'Mapping', icon: GitMerge },
   { id: 'codegen', label: 'Code', icon: Code2 },
+  { id: 'review', label: 'Review', icon: ShieldCheck },
   { id: 'walkthrough', label: 'Walkthrough', icon: BookOpen },
+  { id: 'report', label: 'Report', icon: FileText },
 ];
 
 interface Props {
@@ -22,6 +24,7 @@ export function TabBar({ activeTab, onTabChange, agents }: Props) {
     <div className="tab-bar" role="tablist" aria-label="Pipeline results">
       {TABS.map((tab) => {
         const Icon = tab.icon;
+        const status = tab.id === 'report' ? 'idle' : statusByAgent[tab.id] ?? 'idle';
         return (
           <button
             role="tab"
@@ -32,7 +35,7 @@ export function TabBar({ activeTab, onTabChange, agents }: Props) {
           >
             <Icon size={14} />
             {tab.label}
-            <span className={`tab-dot tab-dot-${statusByAgent[tab.id] ?? 'idle'}`} />
+            <span className={`tab-dot tab-dot-${status}`} />
           </button>
         );
       })}

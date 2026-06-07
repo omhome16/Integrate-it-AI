@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FieldMapping } from '../../types';
+import { displayText } from '../../utils/resultNormalizers';
 
 interface Props {
   mappings: FieldMapping[];
@@ -26,8 +27,13 @@ function shortField(value: string) {
 
 export function FieldMappingDiagram({ mappings, sourceName, targetName }: Props) {
   const [hovered, setHovered] = useState<number | null>(null);
-  const sourceFields = [...new Set(mappings.map((mapping) => mapping.sourceField))];
-  const targetFields = [...new Set(mappings.map((mapping) => mapping.targetField))];
+  const safeMappings = mappings.map((mapping) => ({
+    sourceField: displayText(mapping.sourceField, 'source.field'),
+    targetField: displayText(mapping.targetField, 'target.field'),
+    confidence: Number.isFinite(mapping.confidence) ? mapping.confidence : 0,
+  }));
+  const sourceFields = [...new Set(safeMappings.map((mapping) => mapping.sourceField))];
+  const targetFields = [...new Set(safeMappings.map((mapping) => mapping.targetField))];
   const rows = Math.max(sourceFields.length, targetFields.length, 1);
   const svgH = rows * (FIELD_H + FIELD_GAP) + 72;
 
@@ -38,10 +44,10 @@ export function FieldMappingDiagram({ mappings, sourceName, targetName }: Props)
     <div className="mapping-diagram-wrap">
       <svg className="mapping-diagram" viewBox={`0 0 ${SVG_W} ${svgH}`} role="img" aria-label="Field mapping diagram">
         <text className="svg-heading" x={SRC_X + COL_W / 2} y="26" textAnchor="middle">
-          {sourceName}
+          {displayText(sourceName, 'Source')}
         </text>
         <text className="svg-heading" x={TGT_X + COL_W / 2} y="26" textAnchor="middle">
-          {targetName}
+          {displayText(targetName, 'Target')}
         </text>
 
         {sourceFields.map((field, index) => (
@@ -62,7 +68,7 @@ export function FieldMappingDiagram({ mappings, sourceName, targetName }: Props)
           </g>
         ))}
 
-        {mappings.map((mapping, index) => {
+        {safeMappings.map((mapping, index) => {
           const sourceIndex = sourceFields.indexOf(mapping.sourceField);
           const targetIndex = targetFields.indexOf(mapping.targetField);
           const y1 = fieldCenterY(sourceIndex);

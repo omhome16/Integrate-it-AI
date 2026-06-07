@@ -6,6 +6,7 @@ const LABELS: Record<AgentName | 'system', string> = {
   discovery: 'discovery',
   mapping: 'mapping',
   codegen: 'codegen',
+  review: 'review',
   walkthrough: 'walkthrough',
 };
 

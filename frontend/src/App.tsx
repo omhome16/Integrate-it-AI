@@ -10,6 +10,7 @@ import { usePipeline } from './hooks/usePipeline';
 export default function App() {
   const pipeline = usePipeline();
   const [showToast, setShowToast] = useState(false);
+  const report = pipeline.results.report;
 
   useEffect(() => {
     if (!pipeline.isDone) return;
@@ -36,7 +37,12 @@ export default function App() {
         <LogPanel logs={pipeline.logs} streams={pipeline.streams} activeAgent={pipeline.activeAgent} />
       </div>
 
-      {showToast && <Toast message="Integration pipeline complete" />}
+      {showToast && (
+        <Toast
+          message={report ? `Report saved: ${report.fileName}` : 'Integration pipeline complete'}
+          action={report ? { label: 'PDF', href: report.pdfUrl } : undefined}
+        />
+      )}
     </div>
   );
 }

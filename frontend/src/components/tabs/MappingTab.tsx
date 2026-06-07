@@ -3,6 +3,7 @@ import { Badge } from '../ui/Badge';
 import { EmptyState } from '../ui/EmptyState';
 import { ArrowLeftRight } from 'lucide-react';
 import { DiscoveryResult, MappingResult } from '../../types';
+import { displayText } from '../../utils/resultNormalizers';
 
 interface Props {
   mapping?: MappingResult;
@@ -21,16 +22,19 @@ export function MappingTab({ mapping, discovery, animated }: Props) {
     );
   }
 
+  const mappedPercent = Number.isFinite(mapping.mappedPercent) ? mapping.mappedPercent : 0;
+  const totalFields = Number.isFinite(mapping.totalFields) ? mapping.totalFields : mapping.mappings.length;
+
   return (
     <div className="tab-stack">
       <div className="metric-strip">
         <div>
           <span>Mapped</span>
-          <strong>{mapping.mappedPercent}%</strong>
+          <strong>{mappedPercent}%</strong>
         </div>
         <div>
           <span>Fields</span>
-          <strong>{mapping.mappings.length}/{mapping.totalFields}</strong>
+          <strong>{mapping.mappings.length}/{totalFields}</strong>
         </div>
         <div>
           <span>Review</span>
@@ -40,21 +44,27 @@ export function MappingTab({ mapping, discovery, animated }: Props) {
 
       <FieldMappingDiagram
         mappings={mapping.mappings}
-        sourceName={discovery.source.name}
-        targetName={discovery.target.name}
+        sourceName={displayText(discovery.source.name, 'Source')}
+        targetName={displayText(discovery.target.name, 'Target')}
       />
 
       <div className="mapping-table">
-        {mapping.mappings.map((item) => (
-          <div className="mapping-row" key={`${item.sourceField}-${item.targetField}`}>
-            <code>{item.sourceField}</code>
+        {mapping.mappings.map((item, index) => {
+          const sourceField = displayText(item.sourceField, 'source.field');
+          const targetField = displayText(item.targetField, 'target.field');
+          const confidence = Number.isFinite(item.confidence) ? item.confidence : 0;
+
+          return (
+          <div className="mapping-row" key={`${sourceField}-${targetField}-${index}`}>
+            <code>{sourceField}</code>
             <span className="mapping-arrow">to</span>
-            <code>{item.targetField}</code>
-            <Badge tone={item.confidence > 0.85 ? 'success' : item.confidence > 0.7 ? 'neutral' : 'warn'}>
-              {Math.round(item.confidence * 100)}%
+            <code>{targetField}</code>
+            <Badge tone={confidence > 0.85 ? 'success' : confidence > 0.7 ? 'neutral' : 'warn'}>
+              {Math.round(confidence * 100)}%
             </Badge>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -6,6 +6,8 @@ dist/
 .DS_Store
 npm-debug.log*
 *.tsbuildinfo
+__pycache__/
+*.py[cod]
 frontend/.vite/
 venv
 venv/

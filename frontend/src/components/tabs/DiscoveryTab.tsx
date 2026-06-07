@@ -2,6 +2,7 @@ import { Badge } from '../ui/Badge';
 import { EmptyState } from '../ui/EmptyState';
 import { Network } from 'lucide-react';
 import { ApiInfo, DiscoveryResult } from '../../types';
+import { displayText } from '../../utils/resultNormalizers';
 
 interface Props {
   result?: DiscoveryResult;
@@ -9,27 +10,32 @@ interface Props {
 }
 
 function ApiColumn({ api }: { api: ApiInfo }) {
+  const auth = displayText(api.auth, 'API Key');
+
   return (
     <section className="api-column">
       <div className="api-header">
         <div>
-          <h3>{api.name}</h3>
-          <p>{api.baseUrl}</p>
+          <h3>{displayText(api.name, 'API')}</h3>
+          <p>{displayText(api.baseUrl, 'Not specified')}</p>
         </div>
-        <Badge tone="neutral">{api.auth}</Badge>
+        <Badge tone="neutral">{auth}</Badge>
       </div>
       <div className="endpoint-list">
-        {(api.endpoints || []).map((endpoint) => (
-          <div className="endpoint-row" key={`${endpoint.method}-${endpoint.path}`}>
-            <Badge tone={endpoint.method === 'DELETE' ? 'error' : endpoint.method === 'GET' ? 'cyan' : 'success'}>
-              {endpoint.method}
-            </Badge>
-            <div>
-              <strong>{endpoint.path}</strong>
-              <p>{endpoint.description}</p>
+        {(api.endpoints || []).map((endpoint, index) => {
+          const method = displayText(endpoint.method, 'GET').toUpperCase();
+          const path = displayText(endpoint.path, '/');
+
+          return (
+            <div className="endpoint-row" key={`${method}-${path}-${index}`}>
+              <Badge tone={method === 'DELETE' ? 'error' : method === 'GET' ? 'cyan' : 'success'}>{method}</Badge>
+              <div>
+                <strong>{path}</strong>
+                <p>{displayText(endpoint.description, 'Endpoint')}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

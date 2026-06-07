@@ -1,13 +1,15 @@
 import { useCallback, useRef, useState } from 'react';
 import { runPipelineStream } from '../services/pipelineApi';
 import { AgentName, AgentState, LogEntry, PipelineResults, SSEEvent, TabId } from '../types';
+import { normalizeAgentResult, normalizePipelineResults, normalizeReportInfo } from '../utils/resultNormalizers';
 
-const AGENT_ORDER: AgentName[] = ['discovery', 'mapping', 'codegen', 'walkthrough'];
+const AGENT_ORDER: AgentName[] = ['discovery', 'mapping', 'codegen', 'review', 'walkthrough'];
 
 const TAB_BY_AGENT: Record<AgentName, TabId> = {
   discovery: 'discovery',
   mapping: 'mapping',
   codegen: 'codegen',
+  review: 'review',
   walkthrough: 'walkthrough',
 };
 
@@ -15,6 +17,7 @@ const emptyStreams = (): Record<AgentName, string> => ({
   discovery: '',
   mapping: '',
   codegen: '',
+  review: '',
   walkthrough: '',
 });
 
@@ -92,8 +95,9 @@ export function usePipeline() {
 
       if (event.type === 'agent_done') {
         const elapsedMs = Date.now() - (startTimesRef.current[agent] ?? Date.now());
+        const agentResult = normalizeAgentResult(agent, event.data);
         updateAgent(agent, { status: 'done', elapsedMs });
-        setResults((prev) => ({ ...prev, [agent]: event.data }));
+        setResults((prev) => ({ ...prev, [agent]: agentResult }));
         addLog(agent, `Completed in ${(elapsedMs / 1000).toFixed(1)}s`);
         return;
       }
@@ -101,6 +105,11 @@ export function usePipeline() {
       if (event.type === 'agent_error') {
         updateAgent(agent, { status: 'error' });
         const message = event.data?.message ?? 'Unknown pipeline error';
+        const report = normalizeReportInfo(event.data?.report);
+        if (report) {
+          setResults((prev) => ({ ...prev, report }));
+          setActiveTab('report');
+        }
         setError(message);
         setIsRunning(false);
         addLog(agent, `Error: ${message}`);
@@ -113,10 +122,11 @@ export function usePipeline() {
       }
 
       if (event.type === 'pipeline_done') {
-        setResults(event.data as PipelineResults);
+        setResults(normalizePipelineResults(event.data));
         setIsRunning(false);
         setIsDone(true);
         setActiveAgent(null);
+        setActiveTab('report');
         addLog('system', 'Pipeline complete');
       }
     },

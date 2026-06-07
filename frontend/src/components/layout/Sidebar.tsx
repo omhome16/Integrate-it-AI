@@ -1,13 +1,5 @@
 import { AgentCard } from '../agents/AgentCard';
 import { AgentName, AgentState } from '../../types';
-import { Network, ArrowLeftRight, Code2, Play, LucideIcon } from 'lucide-react';
-
-const AGENT_LABELS: Record<AgentName, { label: string; icon: LucideIcon }> = {
-  discovery: { label: 'Discover APIs', icon: Network },
-  mapping: { label: 'Map fields', icon: ArrowLeftRight },
-  codegen: { label: 'Generate code', icon: Code2 },
-  walkthrough: { label: 'Walkthrough', icon: Play },
-};
 
 interface Props {
   agents: AgentState[];

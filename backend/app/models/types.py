@@ -4,7 +4,7 @@ from typing import Any, Literal, TypedDict
 
 from pydantic import BaseModel, Field
 
-AgentName = Literal["discovery", "mapping", "codegen", "walkthrough"]
+AgentName = Literal["discovery", "mapping", "codegen", "review", "walkthrough"]
 AgentStatus = Literal["idle", "running", "done", "error"]
 SSEEventType = Literal[
     "agent_start",
@@ -75,11 +75,20 @@ class WalkthroughResult(TypedDict):
     steps: list[WalkthroughStep]
     executionCommand: str
 
+class ReportInfo(TypedDict):
+    fileName: str
+    path: str
+    url: str
+    pdfUrl: str
+    generatedAt: str
+
 class PipelineResults(TypedDict, total=False):
     discovery: DiscoveryResult
     mapping: MappingResult
     codegen: str
+    review: str
     walkthrough: WalkthroughResult
+    report: ReportInfo
 
 
 SSEPayload = dict[str, Any]

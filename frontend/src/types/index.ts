@@ -1,6 +1,6 @@
-export type AgentName = 'discovery' | 'mapping' | 'codegen' | 'walkthrough';
+export type AgentName = 'discovery' | 'mapping' | 'codegen' | 'review' | 'walkthrough';
 export type AgentStatus = 'idle' | 'running' | 'done' | 'error';
-export type TabId = AgentName;
+export type TabId = AgentName | 'report';
 
 export interface AgentState {
   name: AgentName;
@@ -79,9 +79,19 @@ export interface WalkthroughResult {
   executionCommand: string;
 }
 
+export interface ReportInfo {
+  fileName: string;
+  path: string;
+  url: string;
+  pdfUrl: string;
+  generatedAt: string;
+}
+
 export interface PipelineResults {
   discovery?: DiscoveryResult;
   mapping?: MappingResult;
   codegen?: string;
+  review?: string;
   walkthrough?: WalkthroughResult;
+  report?: ReportInfo;
 }

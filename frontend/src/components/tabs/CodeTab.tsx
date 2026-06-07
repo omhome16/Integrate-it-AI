@@ -1,5 +1,6 @@
 import { Copy, Code2 } from 'lucide-react';
 import { EmptyState } from '../ui/EmptyState';
+import { displayText } from '../../utils/resultNormalizers';
 
 interface Props {
   code?: string;
@@ -17,13 +18,15 @@ export function CodeTab({ code, animated }: Props) {
     );
   }
 
+  const codeText = displayText(code, '');
+
   return (
     <div className="code-shell">
-      <button className="icon-button copy-button" title="Copy code" onClick={() => navigator.clipboard.writeText(code)}>
+      <button className="icon-button copy-button" title="Copy code" onClick={() => navigator.clipboard.writeText(codeText)}>
         <Copy size={15} />
       </button>
       <pre>
-        <code>{code}</code>
+        <code>{codeText}</code>
       </pre>
     </div>
   );

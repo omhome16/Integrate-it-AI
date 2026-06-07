@@ -1,4 +1,4 @@
-import { Check, Clock, Code2, GitMerge, BookOpen, Zap } from 'lucide-react';
+import { Check, Clock, Code2, GitMerge, BookOpen, ShieldCheck, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { AgentName, AgentState } from '../../types';
 
@@ -6,6 +6,7 @@ const AGENTS: Record<AgentName, { label: string; description: string; icon: Luci
   discovery: { label: 'API Discovery', description: 'Endpoints, auth, schema', icon: Zap },
   mapping: { label: 'Field Mapping', description: 'Types and transforms', icon: GitMerge },
   codegen: { label: 'Code Generation', description: 'Python connector', icon: Code2 },
+  review: { label: 'Production Review', description: 'Audit and rewrite', icon: ShieldCheck },
   walkthrough: { label: 'Walkthrough', description: 'Execution guide', icon: BookOpen },
 };
 
